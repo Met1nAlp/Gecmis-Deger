@@ -3,7 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Modal, Platform, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Animated, Image, Modal, Platform, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { POPULAR_CRYPTOS, fetchCurrentCryptoPrice } from '../api/cryptoApi';
 import { fetchCurrentCurrencyRate } from '../api/currencyApi';
@@ -24,6 +24,7 @@ export default function RatesScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCrypto, setSelectedCrypto] = useState(POPULAR_CRYPTOS[0].id);
   const [showCryptoPicker, setShowCryptoPicker] = useState(false);
+  const logoRotation = new Animated.Value(0);
 
   const loadRates = async () => {
     try {
@@ -58,6 +59,12 @@ export default function RatesScreen() {
 
   const onRefresh = () => {
     setRefreshing(true);
+    // Logo animasyonu
+    Animated.timing(logoRotation, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start(() => logoRotation.setValue(0));
     loadRates();
   };
 
@@ -105,9 +112,23 @@ export default function RatesScreen() {
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Image source={appLogo} style={styles.appLogo} resizeMode="contain" />
-            <View>
+          <View style={styles.headerContent}>
+            <Animated.Image 
+              source={appLogo} 
+              style={[
+                styles.appLogo,
+                {
+                  transform: [{
+                    rotate: logoRotation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '360deg']
+                    })
+                  }]
+                }
+              ]} 
+              resizeMode="contain" 
+            />
+            <View style={styles.headerText}>
               <Text style={styles.headerTitle}>Piyasa Durumu</Text>
               <Text style={styles.headerSubtitle}>Güncel Finansal Veriler</Text>
             </View>
@@ -229,18 +250,40 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  headerLeft: {
+  headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
+    flex: 1,
+  },
+  headerText: {
+    flex: 1,
   },
   appLogo: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.white,
+    padding: 8,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   headerTitle: { fontSize: 32, fontWeight: '800', color: colors.text, letterSpacing: -1 },
   headerSubtitle: { fontSize: 15, color: colors.textSecondary, marginTop: 6, fontWeight: '500' },
-  refreshIcon: { padding: 12, backgroundColor: colors.cardBackground, borderRadius: 12, shadowColor: colors.primary, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3 },
+  refreshIcon: { 
+    padding: 12, 
+    backgroundColor: colors.cardBackground, 
+    borderRadius: 12, 
+    shadowColor: colors.primary, 
+    shadowOpacity: 0.15, 
+    shadowRadius: 8, 
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.primary + '20'
+  },
   scrollContent: { flexGrow: 1, paddingHorizontal: 20, paddingBottom: 100 },
   gridWrapper: { flex: 1, justifyContent: 'center', paddingVertical: 40 },
   gridContainer: { gap: 12 },
@@ -267,6 +310,7 @@ const styles = StyleSheet.create({
     right: -20,
     opacity: 0.15,
   },
+
   cardTextContainer: {
     zIndex: 1,
   },
