@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Varlık Değer Hesaplayıcı",
+    "slug": "varlik-deger-hesaplayici",
+    "version": "1.0.0",
+    "description": "Türkiye'deki enflasyon ve varlık değerlerini geçmişe dönük hesaplayan mobil uygulama",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.varlikdeger.hesaplayici",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "INTERNET"
+      ],
+      "usesCleartextTraffic": true
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png"
+    },
+    "extra": {
+      "EXCHANGE_RATE_API_KEY": "${process.env.EXCHANGE_RATE_API_KEY}",
+      "PRECIOUS_METALS_API_KEY": "${process.env.PRECIOUS_METALS_API_KEY}",
+      "ALPHA_VANTAGE_KEY": "${process.env.ALPHA_VANTAGE_KEY}"
+    }
+  }
+}
