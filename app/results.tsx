@@ -29,7 +29,7 @@ const ICONS: Record<string, any> = {
 export default function ResultsScreen() {
   const params = useLocalSearchParams();
   const { loading, result, error, calculate } = useCalculatorHook();
-  
+
   const assetId = params.assetId as AssetId;
   const theme = assetThemes[assetId || 'dolar'];
   const iconSource = ICONS[assetId || 'dolar'];
@@ -66,14 +66,19 @@ export default function ResultsScreen() {
         colors={[colors.background, theme.primary ? theme.primary + '15' : '#E8EAF6']}
         style={styles.background}
       />
-      
+
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Sonuçlar</Text>
-          <View style={{ width: 40 }} />
+          <View style={styles.headerContent}>
+            <Image source={require('../assets/images/app-logo.png')} style={styles.headerLogo} resizeMode="contain" />
+            <View>
+              <Text style={styles.headerTitle}>Sonuçlar</Text>
+              <Text style={styles.headerSubtitle}>Hesaplama Detayı</Text>
+            </View>
+          </View>
         </View>
 
         <ScrollView contentContainerStyle={styles.content}>
@@ -102,14 +107,14 @@ export default function ResultsScreen() {
                 </View>
                 <Text style={styles.resultLabel}>Toplam Değer</Text>
                 <Text style={styles.resultValue} adjustsFontSizeToFit numberOfLines={1}>{formatCurrency(result.currentValue)}</Text>
-                
+
                 <View style={styles.divider} />
-                
+
                 <View style={styles.row}>
                   <Text style={styles.rowLabel}>İlk Yatırım</Text>
                   <Text style={styles.rowValue}>{formatCurrency(result.initialAmount)}</Text>
                 </View>
-                
+
                 <View style={styles.row}>
                   <Text style={styles.rowLabel}>Kar / Zarar</Text>
                   <Text style={[styles.rowValue, { color: getProfitLossColor() }]}>
@@ -120,10 +125,10 @@ export default function ResultsScreen() {
                 <View style={styles.row}>
                   <Text style={styles.rowLabel}>Değişim Oranı</Text>
                   <View style={[styles.badge, { backgroundColor: result.profit >= 0 ? 'rgba(46, 125, 50, 0.1)' : 'rgba(211, 47, 47, 0.1)' }]}>
-                    <MaterialCommunityIcons 
-                      name={result.profit >= 0 ? 'trending-up' : 'trending-down'} 
-                      size={16} 
-                      color={getProfitLossColor()} 
+                    <MaterialCommunityIcons
+                      name={result.profit >= 0 ? 'trending-up' : 'trending-down'}
+                      size={16}
+                      color={getProfitLossColor()}
                     />
                     <Text style={[styles.badgeText, { color: getProfitLossColor() }]}>
                       %{Math.abs(result.percentageChange).toFixed(2)}
@@ -187,8 +192,11 @@ const styles = StyleSheet.create({
   background: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
   safeArea: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16 },
+  headerContent: { flexDirection: 'row', alignItems: 'center', flex: 1, marginLeft: 16 },
+  headerLogo: { width: 40, height: 40, marginRight: 12, borderRadius: 20 },
   backButton: { padding: 10, backgroundColor: colors.cardBackground, borderRadius: 12, shadowColor: colors.primary, shadowOpacity: 0.08, shadowRadius: 6, elevation: 2 },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
+  headerTitle: { fontSize: 24, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
+  headerSubtitle: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
   content: { padding: 20, paddingBottom: 40 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 120 },
   loadingText: { marginTop: 20, fontSize: 16, color: colors.textSecondary, fontWeight: '600' },

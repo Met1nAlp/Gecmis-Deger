@@ -73,7 +73,6 @@ const ASSET_LABELS: Record<AssetId, string> = {
   stock: 'Hisse Senedi',
   inflation: 'Enflasyon',
   car: 'Araba',
-  ons_altin: 'Ons Altın',
 };
 
 export default function CalculatorScreen() {
@@ -152,7 +151,6 @@ export default function CalculatorScreen() {
     minWage: 'Asgari Ücret',
     inflation: 'Enflasyon',
     car: 'Araba',
-    ons_altin: 'Ons Altın'
   }[assetId];
 
   const iconSource = ICONS[assetId];
@@ -186,263 +184,405 @@ export default function CalculatorScreen() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <LinearGradient
-          colors={[colors.background, theme?.primary ? theme.primary + '15' : '#E8EAF6']}
-          style={styles.background}
-        />
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[colors.background, theme?.primary ? theme.primary + '15' : '#E8EAF6']}
+        style={styles.background}
+      />
 
-        <SafeAreaView style={styles.safeArea}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.keyboardView}
-          >
-            <View style={styles.header}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
-              </TouchableOpacity>
-              <Text style={styles.headerTitle}>Hesaplama</Text>
-              <View style={{ width: 40 }} />
-            </View>
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
+        >
+          {Platform.OS === 'web' ? (
+            <View style={{ flex: 1 }}>
+              <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                  <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
+                </TouchableOpacity>
+                <View style={styles.headerContent}>
+                  <Image source={require('../assets/images/app-logo.png')} style={styles.headerLogo} resizeMode="contain" />
+                  <View>
+                    <Text style={styles.headerTitle}>Hesaplama</Text>
+                    <Text style={styles.headerSubtitle}>Değer Analizi</Text>
+                  </View>
+                </View>
+              </View>
 
-            <ScrollView contentContainerStyle={styles.content}>
-              <GlassCard style={[styles.formCard, { backgroundColor: theme?.primary ? theme.primary + '05' : colors.cardBackground }]}>
-                <View style={styles.formHeader}>
-                  {iconSource ? (
-                    <Image source={iconSource} style={styles.smallIcon} resizeMode="contain" />
-                  ) : (
-                    <FontAwesome5 name={assetId === 'minWage' ? 'wallet' : 'percentage'} size={80} color={theme?.primary || colors.primary} />
+              <ScrollView contentContainerStyle={styles.content}>
+                <GlassCard style={[styles.formCard, { backgroundColor: theme?.primary ? theme.primary + '05' : colors.cardBackground }]}>
+                  <View style={styles.formHeader}>
+                    {iconSource ? (
+                      <Image source={iconSource} style={styles.smallIcon} resizeMode="contain" />
+                    ) : (
+                      <FontAwesome5 name={assetId === 'minWage' ? 'wallet' : 'percentage'} size={80} color={theme?.primary || colors.primary} />
+                    )}
+                    <Text style={styles.assetTitle}>{assetLabel}</Text>
+                  </View>
+                  {assetId === 'btc' && (
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.label}>Kripto Para Birimi</Text>
+                      <TouchableOpacity
+                        style={styles.selectButton}
+                        onPress={() => setShowCryptoPicker(true)}
+                      >
+                        <View style={styles.selectContent}>
+                          <FontAwesome5 name="bitcoin" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
+                          <Text style={styles.selectText}>
+                            {POPULAR_CRYPTOS.find(c => c.id === selectedCrypto)?.name}
+                          </Text>
+                        </View>
+                        <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                    </View>
                   )}
-                  <Text style={styles.assetTitle}>{assetLabel}</Text>
-                </View>
-                {assetId === 'btc' && (
+
+                  {assetId === 'stock' && (
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.label}>Hisse Senedi</Text>
+                      <TouchableOpacity
+                        style={styles.selectButton}
+                        onPress={() => setShowStockPicker(true)}
+                      >
+                        <View style={styles.selectContent}>
+                          <MaterialCommunityIcons name="chart-line" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
+                          <Text style={styles.selectText}>
+                            {POPULAR_STOCKS.find(s => s.id === selectedStock)?.name}
+                          </Text>
+                        </View>
+                        <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
+                  {assetId === 'car' && (
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.label}>Araba Modeli</Text>
+                      <TouchableOpacity
+                        style={styles.selectButton}
+                        onPress={() => setShowCarPicker(true)}
+                      >
+                        <View style={styles.selectContent}>
+                          <MaterialCommunityIcons name="car" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
+                          <Text style={styles.selectText}>
+                            {POPULAR_CARS.find(c => c.id === selectedCar)?.name}
+                          </Text>
+                        </View>
+                        <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
                   <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Kripto Para Birimi</Text>
+                    <Text style={styles.label}>Tutar</Text>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        style={styles.input}
+                        value={amount}
+                        onChangeText={setAmount}
+                        placeholder="0.00"
+                        keyboardType="numeric"
+                        placeholderTextColor="#B0BEC5"
+                      />
+                      <Text style={styles.currencySymbol}>
+                        {assetId === 'dolar' ? '$' : assetId === 'euro' ? '€' : '₺'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Tarih</Text>
                     <TouchableOpacity
-                      style={styles.selectButton}
-                      onPress={() => setShowCryptoPicker(true)}
+                      style={styles.dateButton}
+                      onPress={() => setShowDatePicker(true)}
                     >
-                      <View style={styles.selectContent}>
-                        <FontAwesome5 name="bitcoin" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
-                        <Text style={styles.selectText}>
-                          {POPULAR_CRYPTOS.find(c => c.id === selectedCrypto)?.name}
-                        </Text>
-                      </View>
-                      <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
+                      <Text style={styles.dateText}>
+                        {date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </Text>
+                      <MaterialCommunityIcons name="calendar" size={24} color={colors.primary} />
                     </TouchableOpacity>
                   </View>
-                )}
+                </GlassCard>
 
-                {assetId === 'stock' && (
-                  <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Hisse Senedi</Text>
-                    <TouchableOpacity
-                      style={styles.selectButton}
-                      onPress={() => setShowStockPicker(true)}
-                    >
-                      <View style={styles.selectContent}>
-                        <MaterialCommunityIcons name="chart-line" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
-                        <Text style={styles.selectText}>
-                          {POPULAR_STOCKS.find(s => s.id === selectedStock)?.name}
-                        </Text>
-                      </View>
-                      <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {assetId === 'car' && (
-                  <View style={styles.inputGroup}>
-                    <Text style={styles.label}>Araba Modeli</Text>
-                    <TouchableOpacity
-                      style={styles.selectButton}
-                      onPress={() => setShowCarPicker(true)}
-                    >
-                      <View style={styles.selectContent}>
-                        <MaterialCommunityIcons name="car" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
-                        <Text style={styles.selectText}>
-                          {POPULAR_CARS.find(c => c.id === selectedCar)?.name}
-                        </Text>
-                      </View>
-                      <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Tutar</Text>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      style={styles.input}
-                      value={amount}
-                      onChangeText={setAmount}
-                      placeholder="0.00"
-                      keyboardType="numeric"
-                      placeholderTextColor="#B0BEC5"
-                    />
-                    <Text style={styles.currencySymbol}>
-                      {assetId === 'dolar' ? '$' : assetId === 'euro' ? '€' : '₺'}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Tarih</Text>
-                  <TouchableOpacity
-                    style={styles.dateButton}
-                    onPress={() => setShowDatePicker(true)}
-                  >
-                    <Text style={styles.dateText}>
-                      {date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </Text>
-                    <MaterialCommunityIcons name="calendar" size={24} color={colors.primary} />
-                  </TouchableOpacity>
-                </View>
-              </GlassCard>
-
-              <TouchableOpacity
-                style={[styles.calculateButton, !amount && styles.disabledButton]}
-                onPress={handleCalculate}
-                disabled={!amount || loading}
-              >
-                <LinearGradient
-                  colors={!amount ? ['#ccc', '#999'] : [colors.primary, '#153558']}
-                  style={styles.buttonGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+                <TouchableOpacity
+                  style={[styles.calculateButton, !amount && styles.disabledButton]}
+                  onPress={handleCalculate}
+                  disabled={!amount || loading}
                 >
-                  {loading ? (
-                    <ActivityIndicator color="#fff" />
-                  ) : (
-                    <>
-                      <FontAwesome5 name="calculator" size={20} color="#FFF" />
-                      <Text style={styles.calculateButtonText}>HESAPLA</Text>
-                    </>
-                  )}
-                </LinearGradient>
-              </TouchableOpacity>
-            </ScrollView>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
-
-        {/* Tarih Seçim Modalı */}
-        <Modal visible={showDatePicker} transparent={true} animationType="slide" onRequestClose={() => { setShowDatePicker(false); setDateStep('year'); }}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                {dateStep !== 'year' && (
-                  <TouchableOpacity onPress={() => setDateStep(dateStep === 'day' ? 'month' : 'year')} style={styles.backBtn}>
+                  <LinearGradient
+                    colors={!amount ? ['#ccc', '#999'] : [colors.primary, '#153558']}
+                    style={styles.buttonGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <>
+                        <FontAwesome5 name="calculator" size={20} color="#FFF" />
+                        <Text style={styles.calculateButtonText}>HESAPLA</Text>
+                      </>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
+          ) : (
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={{ flex: 1 }}>
+                <View style={styles.header}>
+                  <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
                   </TouchableOpacity>
-                )}
-                <Text style={styles.modalTitle}>
-                  {dateStep === 'year' ? 'Yıl Seçin' : dateStep === 'month' ? 'Ay Seçin' : 'Gün Seçin'}
-                </Text>
-                <TouchableOpacity onPress={() => { setShowDatePicker(false); setDateStep('year'); }} style={styles.closeButton}>
-                  <MaterialCommunityIcons name="close" size={24} color={colors.text} />
-                </TouchableOpacity>
-              </View>
-              <ScrollView contentContainerStyle={styles.modalList}>
-                {dateStep === 'year' && Array.from({ length: new Date().getFullYear() - minDate.getFullYear() + 1 }, (_, i) => new Date().getFullYear() - i).map((year) => (
-                  <TouchableOpacity key={year} style={[styles.modalItem, selectedYear === year && styles.modalItemSelected]} onPress={() => { setSelectedYear(year); setDateStep('month'); }}>
-                    <Text style={[styles.modalItemText, selectedYear === year && styles.modalItemTextSelected]}>{year}</Text>
-                    <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
-                  </TouchableOpacity>
-                ))}
-                {dateStep === 'month' && ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'].map((month, idx) => (
-                  <TouchableOpacity key={idx} style={[styles.modalItem, selectedMonth === idx && styles.modalItemSelected]} onPress={() => { setSelectedMonth(idx); setDateStep('day'); }}>
-                    <Text style={[styles.modalItemText, selectedMonth === idx && styles.modalItemTextSelected]}>{month}</Text>
-                    <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
-                  </TouchableOpacity>
-                ))}
-                {dateStep === 'day' && Array.from({ length: new Date(selectedYear, selectedMonth + 1, 0).getDate() }, (_, i) => i + 1).map((day) => (
-                  <TouchableOpacity key={day} style={styles.modalItem} onPress={() => { setDate(new Date(selectedYear, selectedMonth, day)); setShowDatePicker(false); setDateStep('year'); }}>
-                    <Text style={styles.modalItemText}>{day} {['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'][selectedMonth]} {selectedYear}</Text>
-                    <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
-
-        {/* Kripto Seçim Modalı */}
-        <Modal visible={showCryptoPicker} transparent={true} animationType="slide" onRequestClose={() => setShowCryptoPicker(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Kripto Para Seç</Text>
-                <TouchableOpacity onPress={() => setShowCryptoPicker(false)} style={styles.closeButton}>
-                  <MaterialCommunityIcons name="close" size={24} color={colors.text} />
-                </TouchableOpacity>
-              </View>
-              <ScrollView contentContainerStyle={styles.modalList}>
-                {POPULAR_CRYPTOS.map((crypto) => (
-                  <TouchableOpacity key={crypto.id} style={[styles.modalItem, selectedCrypto === crypto.id && styles.modalItemSelected]} onPress={() => { setSelectedCrypto(crypto.id); setShowCryptoPicker(false); }}>
-                    <View style={styles.modalItemContent}>
-                      <FontAwesome5 name="bitcoin" size={20} color={selectedCrypto === crypto.id ? colors.primary : colors.textSecondary} />
-                      <Text style={[styles.modalItemText, selectedCrypto === crypto.id && styles.modalItemTextSelected]}>{crypto.name}</Text>
+                  <View style={styles.headerContent}>
+                    <Image source={require('../assets/images/app-logo.png')} style={styles.headerLogo} resizeMode="contain" />
+                    <View>
+                      <Text style={styles.headerTitle}>Hesaplama</Text>
+                      <Text style={styles.headerSubtitle}>Değer Analizi</Text>
                     </View>
-                    {selectedCrypto === crypto.id && <MaterialCommunityIcons name="check" size={20} color={colors.primary} />}
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
+                  </View>
+                </View>
 
-        {/* Hisse Senedi Seçim Modalı */}
-        <Modal visible={showStockPicker} transparent={true} animationType="slide" onRequestClose={() => setShowStockPicker(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Hisse Senedi Seç</Text>
-                <TouchableOpacity onPress={() => setShowStockPicker(false)} style={styles.closeButton}>
-                  <MaterialCommunityIcons name="close" size={24} color={colors.text} />
-                </TouchableOpacity>
-              </View>
-              <ScrollView contentContainerStyle={styles.modalList}>
-                {POPULAR_STOCKS.map((stock) => (
-                  <TouchableOpacity key={stock.id} style={[styles.modalItem, selectedStock === stock.id && styles.modalItemSelected]} onPress={() => { setSelectedStock(stock.id); setShowStockPicker(false); }}>
-                    <View style={styles.modalItemContent}>
-                      <MaterialCommunityIcons name="chart-line" size={20} color={selectedStock === stock.id ? colors.primary : colors.textSecondary} />
-                      <Text style={[styles.modalItemText, selectedStock === stock.id && styles.modalItemTextSelected]}>{stock.name}</Text>
+                <ScrollView contentContainerStyle={styles.content}>
+                  <GlassCard style={[styles.formCard, { backgroundColor: theme?.primary ? theme.primary + '05' : colors.cardBackground }]}>
+                    <View style={styles.formHeader}>
+                      {iconSource ? (
+                        <Image source={iconSource} style={styles.smallIcon} resizeMode="contain" />
+                      ) : (
+                        <FontAwesome5 name={assetId === 'minWage' ? 'wallet' : 'percentage'} size={80} color={theme?.primary || colors.primary} />
+                      )}
+                      <Text style={styles.assetTitle}>{assetLabel}</Text>
                     </View>
-                    {selectedStock === stock.id && <MaterialCommunityIcons name="check" size={20} color={colors.primary} />}
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
+                    {assetId === 'btc' && (
+                      <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Kripto Para Birimi</Text>
+                        <TouchableOpacity
+                          style={styles.selectButton}
+                          onPress={() => setShowCryptoPicker(true)}
+                        >
+                          <View style={styles.selectContent}>
+                            <FontAwesome5 name="bitcoin" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
+                            <Text style={styles.selectText}>
+                              {POPULAR_CRYPTOS.find(c => c.id === selectedCrypto)?.name}
+                            </Text>
+                          </View>
+                          <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
+                        </TouchableOpacity>
+                      </View>
+                    )}
 
-        {/* Araba Seçim Modalı */}
-        <Modal visible={showCarPicker} transparent={true} animationType="slide" onRequestClose={() => setShowCarPicker(false)}>
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Araba Seç</Text>
-                <TouchableOpacity onPress={() => setShowCarPicker(false)} style={styles.closeButton}>
-                  <MaterialCommunityIcons name="close" size={24} color={colors.text} />
-                </TouchableOpacity>
-              </View>
-              <ScrollView contentContainerStyle={styles.modalList}>
-                {POPULAR_CARS.map((car) => (
-                  <TouchableOpacity key={car.id} style={[styles.modalItem, selectedCar === car.id && styles.modalItemSelected]} onPress={() => { setSelectedCar(car.id); setShowCarPicker(false); }}>
-                    <View style={styles.modalItemContent}>
-                      <MaterialCommunityIcons name="car" size={20} color={selectedCar === car.id ? colors.primary : colors.textSecondary} />
-                      <Text style={[styles.modalItemText, selectedCar === car.id && styles.modalItemTextSelected]}>{car.name}</Text>
+                    {assetId === 'stock' && (
+                      <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Hisse Senedi</Text>
+                        <TouchableOpacity
+                          style={styles.selectButton}
+                          onPress={() => setShowStockPicker(true)}
+                        >
+                          <View style={styles.selectContent}>
+                            <MaterialCommunityIcons name="chart-line" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
+                            <Text style={styles.selectText}>
+                              {POPULAR_STOCKS.find(s => s.id === selectedStock)?.name}
+                            </Text>
+                          </View>
+                          <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+
+                    {assetId === 'car' && (
+                      <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Araba Modeli</Text>
+                        <TouchableOpacity
+                          style={styles.selectButton}
+                          onPress={() => setShowCarPicker(true)}
+                        >
+                          <View style={styles.selectContent}>
+                            <MaterialCommunityIcons name="car" size={20} color={theme?.primary || colors.primary} style={{ marginRight: 10 }} />
+                            <Text style={styles.selectText}>
+                              {POPULAR_CARS.find(c => c.id === selectedCar)?.name}
+                            </Text>
+                          </View>
+                          <MaterialCommunityIcons name="chevron-down" size={24} color={colors.textSecondary} />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.label}>Tutar</Text>
+                      <View style={styles.inputContainer}>
+                        <TextInput
+                          style={styles.input}
+                          value={amount}
+                          onChangeText={setAmount}
+                          placeholder="0.00"
+                          keyboardType="numeric"
+                          placeholderTextColor="#B0BEC5"
+                        />
+                        <Text style={styles.currencySymbol}>
+                          {assetId === 'dolar' ? '$' : assetId === 'euro' ? '€' : '₺'}
+                        </Text>
+                      </View>
                     </View>
-                    {selectedCar === car.id && <MaterialCommunityIcons name="check" size={20} color={colors.primary} />}
+
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.label}>Tarih</Text>
+                      <TouchableOpacity
+                        style={styles.dateButton}
+                        onPress={() => setShowDatePicker(true)}
+                      >
+                        <Text style={styles.dateText}>
+                          {date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </Text>
+                        <MaterialCommunityIcons name="calendar" size={24} color={colors.primary} />
+                      </TouchableOpacity>
+                    </View>
+                  </GlassCard>
+
+                  <TouchableOpacity
+                    style={[styles.calculateButton, !amount && styles.disabledButton]}
+                    onPress={handleCalculate}
+                    disabled={!amount || loading}
+                  >
+                    <LinearGradient
+                      colors={!amount ? ['#ccc', '#999'] : [colors.primary, '#153558']}
+                      style={styles.buttonGradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                    >
+                      {loading ? (
+                        <ActivityIndicator color="#fff" />
+                      ) : (
+                        <>
+                          <FontAwesome5 name="calculator" size={20} color="#FFF" />
+                          <Text style={styles.calculateButtonText}>HESAPLA</Text>
+                        </>
+                      )}
+                    </LinearGradient>
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          )}
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+
+      {/* Tarih Seçim Modalı */}
+      <Modal visible={showDatePicker} transparent={true} animationType="slide" onRequestClose={() => { setShowDatePicker(false); setDateStep('year'); }}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              {dateStep !== 'year' && (
+                <TouchableOpacity onPress={() => setDateStep(dateStep === 'day' ? 'month' : 'year')} style={styles.backBtn}>
+                  <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
+                </TouchableOpacity>
+              )}
+              <Text style={styles.modalTitle}>
+                {dateStep === 'year' ? 'Yıl Seçin' : dateStep === 'month' ? 'Ay Seçin' : 'Gün Seçin'}
+              </Text>
+              <TouchableOpacity onPress={() => { setShowDatePicker(false); setDateStep('year'); }} style={styles.closeButton}>
+                <MaterialCommunityIcons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
             </View>
+            <ScrollView contentContainerStyle={styles.modalList}>
+              {dateStep === 'year' && Array.from({ length: new Date().getFullYear() - minDate.getFullYear() + 1 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                <TouchableOpacity key={year} style={[styles.modalItem, selectedYear === year && styles.modalItemSelected]} onPress={() => { setSelectedYear(year); setDateStep('month'); }}>
+                  <Text style={[styles.modalItemText, selectedYear === year && styles.modalItemTextSelected]}>{year}</Text>
+                  <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
+                </TouchableOpacity>
+              ))}
+              {dateStep === 'month' && ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'].map((month, idx) => (
+                <TouchableOpacity key={idx} style={[styles.modalItem, selectedMonth === idx && styles.modalItemSelected]} onPress={() => { setSelectedMonth(idx); setDateStep('day'); }}>
+                  <Text style={[styles.modalItemText, selectedMonth === idx && styles.modalItemTextSelected]}>{month}</Text>
+                  <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
+                </TouchableOpacity>
+              ))}
+              {dateStep === 'day' && Array.from({ length: new Date(selectedYear, selectedMonth + 1, 0).getDate() }, (_, i) => i + 1).map((day) => (
+                <TouchableOpacity key={day} style={styles.modalItem} onPress={() => { setDate(new Date(selectedYear, selectedMonth, day)); setShowDatePicker(false); setDateStep('year'); }}>
+                  <Text style={styles.modalItemText}>{day} {['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'][selectedMonth]} {selectedYear}</Text>
+                  <MaterialCommunityIcons name="chevron-right" size={20} color={colors.textSecondary} />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
-        </Modal>
-      </View>
-    </TouchableWithoutFeedback>
+        </View>
+      </Modal>
+
+      {/* Kripto Seçim Modalı */}
+      <Modal visible={showCryptoPicker} transparent={true} animationType="slide" onRequestClose={() => setShowCryptoPicker(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Kripto Para Seç</Text>
+              <TouchableOpacity onPress={() => setShowCryptoPicker(false)} style={styles.closeButton}>
+                <MaterialCommunityIcons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView contentContainerStyle={styles.modalList}>
+              {POPULAR_CRYPTOS.map((crypto) => (
+                <TouchableOpacity key={crypto.id} style={[styles.modalItem, selectedCrypto === crypto.id && styles.modalItemSelected]} onPress={() => { setSelectedCrypto(crypto.id); setShowCryptoPicker(false); }}>
+                  <View style={styles.modalItemContent}>
+                    <FontAwesome5 name="bitcoin" size={20} color={selectedCrypto === crypto.id ? colors.primary : colors.textSecondary} />
+                    <Text style={[styles.modalItemText, selectedCrypto === crypto.id && styles.modalItemTextSelected]}>{crypto.name}</Text>
+                  </View>
+                  {selectedCrypto === crypto.id && <MaterialCommunityIcons name="check" size={20} color={colors.primary} />}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Hisse Senedi Seçim Modalı */}
+      <Modal visible={showStockPicker} transparent={true} animationType="slide" onRequestClose={() => setShowStockPicker(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Hisse Senedi Seç</Text>
+              <TouchableOpacity onPress={() => setShowStockPicker(false)} style={styles.closeButton}>
+                <MaterialCommunityIcons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView contentContainerStyle={styles.modalList}>
+              {POPULAR_STOCKS.map((stock) => (
+                <TouchableOpacity key={stock.id} style={[styles.modalItem, selectedStock === stock.id && styles.modalItemSelected]} onPress={() => { setSelectedStock(stock.id); setShowStockPicker(false); }}>
+                  <View style={styles.modalItemContent}>
+                    <MaterialCommunityIcons name="chart-line" size={20} color={selectedStock === stock.id ? colors.primary : colors.textSecondary} />
+                    <Text style={[styles.modalItemText, selectedStock === stock.id && styles.modalItemTextSelected]}>{stock.name}</Text>
+                  </View>
+                  {selectedStock === stock.id && <MaterialCommunityIcons name="check" size={20} color={colors.primary} />}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Araba Seçim Modalı */}
+      <Modal visible={showCarPicker} transparent={true} animationType="slide" onRequestClose={() => setShowCarPicker(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Araba Seç</Text>
+              <TouchableOpacity onPress={() => setShowCarPicker(false)} style={styles.closeButton}>
+                <MaterialCommunityIcons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView contentContainerStyle={styles.modalList}>
+              {POPULAR_CARS.map((car) => (
+                <TouchableOpacity key={car.id} style={[styles.modalItem, selectedCar === car.id && styles.modalItemSelected]} onPress={() => { setSelectedCar(car.id); setShowCarPicker(false); }}>
+                  <View style={styles.modalItemContent}>
+                    <MaterialCommunityIcons name="car" size={20} color={selectedCar === car.id ? colors.primary : colors.textSecondary} />
+                    <Text style={[styles.modalItemText, selectedCar === car.id && styles.modalItemTextSelected]}>{car.name}</Text>
+                  </View>
+                  {selectedCar === car.id && <MaterialCommunityIcons name="check" size={20} color={colors.primary} />}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }
 
@@ -452,8 +592,11 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   keyboardView: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16 },
+  headerContent: { flexDirection: 'row', alignItems: 'center', flex: 1, marginLeft: 16 },
+  headerLogo: { width: 40, height: 40, marginRight: 12, borderRadius: 20 },
   backButton: { padding: 10, backgroundColor: colors.cardBackground, borderRadius: 12, shadowColor: colors.primary, shadowOpacity: 0.08, shadowRadius: 6, elevation: 2 },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
+  headerTitle: { fontSize: 24, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
+  headerSubtitle: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
   content: { padding: 20, paddingBottom: 40 },
   formCard: { padding: 20, borderRadius: 16, backgroundColor: colors.cardBackground, marginBottom: 16 },
   formHeader: { alignItems: 'center', marginBottom: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: colors.border },

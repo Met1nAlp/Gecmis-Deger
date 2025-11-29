@@ -1,4 +1,5 @@
 import { API_CONFIG } from '../constants/apiConfig';
+import { fetchWithCache } from '../utils/apiCache';
 
 export const POPULAR_CRYPTOS = [
   { id: 'bitcoin', name: 'Bitcoin (BTC)', symbol: 'BTC' },
@@ -28,9 +29,8 @@ const getHistoricalCryptoPrice = (coinId: string, year: number): number => {
 export const fetchCurrentCryptoPrice = async (coinId: string = 'bitcoin'): Promise<{ price: number; source: string }> => {
   try {
     const url = `${API_CONFIG.COINGECKO_BASE_URL}/simple/price?ids=${coinId}&vs_currencies=usd`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`CoinGecko hata: ${response.status}`);
-    const data = await response.json();
+    const data = await fetchWithCache(coinId, url);
+
     if (data[coinId]?.usd) {
       console.log(`✓ CoinGecko ${coinId}:`, data[coinId].usd);
       return { price: data[coinId].usd, source: 'CoinGecko' };

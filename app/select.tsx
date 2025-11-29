@@ -46,11 +46,13 @@ export default function SelectScreen() {
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
               <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
             </TouchableOpacity>
-            <View style={styles.headerCenter}>
+            <View style={styles.headerContent}>
               <Image source={appLogo} style={styles.headerLogo} resizeMode="contain" />
-              <Text style={styles.headerTitle}>Varlık Seçimi</Text>
+              <View>
+                <Text style={styles.headerTitle}>Varlık Seçimi</Text>
+                <Text style={styles.headerSubtitle}>Hesaplama Türü</Text>
+              </View>
             </View>
-            <View style={{ width: 40 }} />
           </View>
 
           <ScrollView contentContainerStyle={styles.content}>
@@ -94,9 +96,10 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16 },
   backButton: { padding: 10, backgroundColor: colors.cardBackground, borderRadius: 12, shadowColor: colors.primary, shadowOpacity: 0.08, shadowRadius: 6, elevation: 2 },
-  headerCenter: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headerLogo: { width: 32, height: 32 },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
+  headerContent: { flexDirection: 'row', alignItems: 'center', flex: 1, marginLeft: 16 },
+  headerLogo: { width: 40, height: 40, marginRight: 12, borderRadius: 20 },
+  headerTitle: { fontSize: 24, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
+  headerSubtitle: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },
   content: { padding: 20, paddingBottom: 40 },
   title: { fontSize: 32, fontWeight: '800', color: colors.text, marginBottom: 8, letterSpacing: -1 },
   subtitle: { fontSize: 15, color: colors.textSecondary, marginBottom: 24, lineHeight: 22 },

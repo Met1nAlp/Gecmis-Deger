@@ -8,8 +8,10 @@ import 'react-native-reanimated';
 export default function RootLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="index" />
+      <Stack.Screen name="portfolio" />
       <Stack.Screen name="calculator" />
+      <Stack.Screen name="select" />
       <Stack.Screen name="results" />
     </Stack>
   );

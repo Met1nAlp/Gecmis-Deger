@@ -1,9 +1,14 @@
 import { API_CONFIG } from '../constants/apiConfig';
+import { fetchWithCache } from '../utils/apiCache';
 import { fetchCurrentCurrencyRate } from './currencyApi';
 
 const getFallbackGoldPriceForYear = (year: number): number => {
   const fallbacks: { [key: number]: number } = {
     2024: 3000, 2023: 1800, 2022: 1000, 2021: 500, 2020: 300,
+    2019: 280, 2018: 220, 2017: 150, 2016: 120, 2015: 100,
+    2014: 90, 2013: 85, 2012: 95, 2011: 80, 2010: 60,
+    2009: 50, 2008: 40, 2007: 30, 2006: 25, 2005: 20,
+    2004: 18, 2003: 16, 2002: 14, 2001: 10, 2000: 5,
   };
   return fallbacks[year] || 3000;
 };
@@ -16,10 +21,11 @@ const fetchFromCoinGeckoPAXG = async (): Promise<{ price: number; source: string
 
     // 1. PAXG fiyatını USD olarak çek
     const url = `${API_CONFIG.COINGECKO_BASE_URL}/simple/price?ids=pax-gold&vs_currencies=usd`;
-    const response = await fetch(url);
-    if (!response.ok) return null;
+    const data = await fetchWithCache('pax-gold', url);
+    // const response = await fetch(url);
+    // if (!response.ok) return null;
 
-    const data = await response.json();
+    // const data = await response.json();
     const paxgUsd = data['pax-gold']?.usd; // 1 Ons Altın ($)
 
     if (paxgUsd) {

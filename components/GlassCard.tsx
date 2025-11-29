@@ -1,11 +1,11 @@
 // @ts-ignore
 import { BlurView } from 'expo-blur';
 import React from 'react';
-import { Platform, StyleSheet, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 type GlassCardProps = {
     children: React.ReactNode;
-    style?: ViewStyle;
+    style?: StyleProp<ViewStyle>;
 };
 
 export const GlassCard: React.FC<GlassCardProps> = ({ children, style }) => {

@@ -79,5 +79,11 @@ export const assetThemes: Record<string, AssetTheme> = {
     symbols: ['oz', 'oz', 'oz', 'oz', 'oz', 'oz', 'oz', 'oz'],
     primary: '#FFD700',
     secondary: '#FFC107'
+  },
+  custom: {
+    colors: ['#78909C', '#90A4AE', '#B0BEC5'],
+    symbols: ['★', '★', '★', '★', '★', '★', '★', '★'],
+    primary: '#78909C',
+    secondary: '#90A4AE'
   }
 };

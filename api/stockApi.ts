@@ -1,4 +1,6 @@
 
+import { fetchWithCache } from '../utils/apiCache';
+
 const getFallbackStockPriceForYear = (symbol: string, year: number): number => {
   const fallbacks: { [key: string]: { [key: number]: number } } = {
     'THYAO.IS': { 2024: 290, 2023: 220, 2022: 180, 2021: 150, 2020: 120 },
@@ -17,10 +19,11 @@ const fetchFromBigPara = async (symbol: string): Promise<{ price: number; source
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
 
     console.log(`BigPara isteği gönderiliyor: ${cleanSymbol}`);
-    const response = await fetch(proxyUrl);
-    if (!response.ok) return null;
+    const data = await fetchWithCache(symbol, proxyUrl);
+    // const response = await fetch(proxyUrl);
+    // if (!response.ok) return null;
 
-    const data = await response.json();
+    // const data = await response.json();
     // BigPara response structure: { data: { last: 290.50, ... } }
     const price = data?.data?.last;
 

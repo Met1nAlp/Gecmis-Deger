@@ -4,19 +4,19 @@ import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { POPULAR_CRYPTOS } from '../api/cryptoApi';
-import { GlassCard } from '../components/GlassCard';
-import { assetThemes, colors } from '../constants/theme';
-import { usePortfolio } from '../hooks/usePortfolio';
-import { AssetId, PortfolioItem } from '../types';
+import { POPULAR_CRYPTOS } from '../../api/cryptoApi';
+import { GlassCard } from '../../components/GlassCard';
+import { assetThemes, colors } from '../../constants/theme';
+import { usePortfolio } from '../../hooks/usePortfolio';
+import { AssetId, PortfolioItem } from '../../types';
 
 // 3D Icons
-const iconDollar = require('../assets/images/icon_dollar.png');
-const iconEuro = require('../assets/images/icon_euro.png');
-const iconGold = require('../assets/images/icon_gold.png');
-const iconBitcoin = require('../assets/images/icon_bitcoin.png');
-const iconCar = require('../assets/images/icon_car.png');
-const iconStock = require('../assets/images/icon_stock.png');
+const iconDollar = require('../../assets/images/icon_dollar.png');
+const iconEuro = require('../../assets/images/icon_euro.png');
+const iconGold = require('../../assets/images/icon_gold.png');
+const iconBitcoin = require('../../assets/images/icon_bitcoin.png');
+const iconCar = require('../../assets/images/icon_car.png');
+const iconStock = require('../../assets/images/icon_stock.png');
 
 const ICONS: Record<string, any> = {
   dolar: iconDollar,
@@ -44,7 +44,7 @@ export default function PortfolioScreen() {
   const [dateStep, setDateStep] = useState<'year' | 'month' | 'day'>('year');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const appLogo = require('../assets/images/app-logo.png');
+  const appLogo = require('../../assets/images/app-logo.png');
 
   useEffect(() => {
     loadPortfolio();
@@ -193,9 +193,6 @@ export default function PortfolioScreen() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-              <MaterialCommunityIcons name="arrow-left" size={24} color={colors.primary} />
-            </TouchableOpacity>
             <Image source={appLogo} style={styles.headerLogo} resizeMode="contain" />
             <View style={{ flex: 1 }}>
               <Text style={styles.headerTitle}>Portföyüm</Text>
@@ -499,7 +496,6 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingVertical: 16 },
   headerContent: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  backButton: { padding: 8, marginRight: 8 },
   headerLogo: { width: 40, height: 40, marginRight: 12, borderRadius: 20 },
   headerTitle: { fontSize: 24, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
   headerSubtitle: { fontSize: 13, color: colors.textSecondary, fontWeight: '500' },

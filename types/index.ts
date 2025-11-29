@@ -1,6 +1,6 @@
 // DOSYA YOLU: types/index.ts
 
-export type AssetId = 'btc' | 'dolar' | 'euro' | 'altin' | 'ons_altin' | 'minWage' | 'stock' | 'inflation' | 'car';
+export type AssetId = 'btc' | 'dolar' | 'euro' | 'altin' | 'ons_altin' | 'minWage' | 'stock' | 'inflation' | 'car' | 'custom';
 
 export interface CalculationResult {
   id: AssetId;
@@ -38,4 +38,6 @@ export interface PortfolioItem {
   cryptoId?: string;
   stockSymbol?: string;
   carId?: string;
+  customName?: string;
+  customCurrentPrice?: number;
 }

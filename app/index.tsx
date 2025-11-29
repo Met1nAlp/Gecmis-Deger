@@ -8,17 +8,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { POPULAR_CRYPTOS, fetchCurrentCryptoPrice } from '../api/cryptoApi';
 import { fetchCurrentCurrencyRate } from '../api/currencyApi';
 import { fetchCurrentGoldPrice } from '../api/goldApi';
-import { GlassCard } from '../components/GlassCard';
 import { colors } from '../constants/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// 3D Icons
 const iconDollar = require('../assets/images/icon_dollar.png');
 const iconEuro = require('../assets/images/icon_euro.png');
 const iconGold = require('../assets/images/icon_gold.png');
 const iconBitcoin = require('../assets/images/icon_bitcoin.png');
 const appLogo = require('../assets/images/app-logo.png');
 
-export default function RatesScreen() {
+export default function HomeScreen() {
   const [rates, setRates] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -28,6 +27,13 @@ export default function RatesScreen() {
 
   const loadRates = async () => {
     try {
+      // Önce cache'den yükle
+      const cachedRates = await AsyncStorage.getItem('@last_rates');
+      if (cachedRates && !rates) {
+        setRates(JSON.parse(cachedRates));
+        setLoading(false);
+      }
+
       const [usdData, eurData, goldData, cryptoData] = await Promise.all([
         fetchCurrentCurrencyRate('USD'),
         fetchCurrentCurrencyRate('EUR'),
@@ -35,14 +41,23 @@ export default function RatesScreen() {
         fetchCurrentCryptoPrice(selectedCrypto),
       ]);
 
-      setRates({
+      const newRates = {
         usd: usdData,
         eur: eurData,
         gold: goldData,
         crypto: cryptoData
-      });
+      };
+
+      setRates(newRates);
+      // Son veriyi kaydet
+      await AsyncStorage.setItem('@last_rates', JSON.stringify(newRates));
     } catch (error) {
       console.error('Veri yükleme hatası:', error);
+      // Hata durumunda cache'den yükle
+      const cachedRates = await AsyncStorage.getItem('@last_rates');
+      if (cachedRates) {
+        setRates(JSON.parse(cachedRates));
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -59,7 +74,6 @@ export default function RatesScreen() {
 
   const onRefresh = () => {
     setRefreshing(true);
-    // Logo animasyonu
     Animated.timing(logoRotation, {
       toValue: 1,
       duration: 1000,
@@ -71,12 +85,6 @@ export default function RatesScreen() {
   const updateCrypto = async () => {
     const data = await fetchCurrentCryptoPrice(selectedCrypto);
     setRates((prev: any) => prev ? { ...prev, crypto: data } : prev);
-  };
-
-  const getStatusColor = (source: string) => {
-    if (source.includes('Yedek') || source.includes('Tahmini')) return colors.secondary;
-    if (source.includes('Hata')) return colors.danger;
-    return colors.success;
   };
 
   const RateCard = ({ iconSource, title, data, prefix = '₺', assetId }: any) => (
@@ -113,8 +121,8 @@ export default function RatesScreen() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <Animated.Image 
-              source={appLogo} 
+            <Animated.Image
+              source={appLogo}
               style={[
                 styles.appLogo,
                 {
@@ -125,17 +133,22 @@ export default function RatesScreen() {
                     })
                   }]
                 }
-              ]} 
-              resizeMode="contain" 
+              ]}
+              resizeMode="contain"
             />
             <View style={styles.headerText}>
               <Text style={styles.headerTitle}>Piyasa Durumu</Text>
               <Text style={styles.headerSubtitle}>Güncel Finansal Veriler</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.refreshIcon} onPress={onRefresh}>
-            <MaterialCommunityIcons name="refresh" size={24} color={colors.primary} />
-          </TouchableOpacity>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity style={styles.iconButton} onPress={() => router.push('/portfolio')}>
+              <MaterialCommunityIcons name="briefcase" size={24} color={colors.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={onRefresh}>
+              <MaterialCommunityIcons name="refresh" size={24} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <ScrollView
@@ -148,36 +161,36 @@ export default function RatesScreen() {
           ) : rates ? (
             <View style={styles.gridWrapper}>
               <View style={styles.gridContainer}>
-              <View style={styles.gridRow}>
-                <RateCard
-                  iconSource={iconDollar}
-                  title="Amerikan Doları"
-                  data={rates.usd}
-                  assetId="dolar"
-                />
-                <RateCard
-                  iconSource={iconEuro}
-                  title="Euro"
-                  data={rates.eur}
-                  assetId="euro"
-                />
+                <View style={styles.gridRow}>
+                  <RateCard
+                    iconSource={iconDollar}
+                    title="Amerikan Doları"
+                    data={rates.usd}
+                    assetId="dolar"
+                  />
+                  <RateCard
+                    iconSource={iconEuro}
+                    title="Euro"
+                    data={rates.eur}
+                    assetId="euro"
+                  />
+                </View>
+                <View style={styles.gridRow}>
+                  <RateCard
+                    iconSource={iconGold}
+                    title="Gram Altın"
+                    data={rates.gold}
+                    assetId="altin"
+                  />
+                  <SelectableRateCard
+                    iconSource={iconBitcoin}
+                    title={POPULAR_CRYPTOS.find(c => c.id === selectedCrypto)?.name}
+                    data={rates.crypto}
+                    prefix="$"
+                    onPress={() => setShowCryptoPicker(true)}
+                  />
+                </View>
               </View>
-              <View style={styles.gridRow}>
-                <RateCard
-                  iconSource={iconGold}
-                  title="Gram Altın"
-                  data={rates.gold}
-                  assetId="altin"
-                />
-                <SelectableRateCard
-                  iconSource={iconBitcoin}
-                  title={POPULAR_CRYPTOS.find(c => c.id === selectedCrypto)?.name}
-                  data={rates.crypto}
-                  prefix="$"
-                  onPress={() => setShowCryptoPicker(true)}
-                />
-              </View>
-            </View>
             </View>
           ) : (
             <Text style={styles.errorText}>Veriler yüklenemedi.</Text>
@@ -202,7 +215,6 @@ export default function RatesScreen() {
         </View>
       </SafeAreaView>
 
-      {/* Kripto Seçim Modalı */}
       <Modal visible={showCryptoPicker} animationType="slide" transparent={true}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -273,13 +285,17 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontSize: 32, fontWeight: '800', color: colors.text, letterSpacing: -1 },
   headerSubtitle: { fontSize: 15, color: colors.textSecondary, marginTop: 6, fontWeight: '500' },
-  refreshIcon: { 
-    padding: 12, 
-    backgroundColor: colors.cardBackground, 
-    borderRadius: 12, 
-    shadowColor: colors.primary, 
-    shadowOpacity: 0.15, 
-    shadowRadius: 8, 
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  iconButton: {
+    padding: 12,
+    backgroundColor: colors.cardBackground,
+    borderRadius: 12,
+    shadowColor: colors.primary,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
     elevation: 5,
     borderWidth: 1,
     borderColor: colors.primary + '20'
@@ -310,7 +326,6 @@ const styles = StyleSheet.create({
     right: -20,
     opacity: 0.15,
   },
-
   cardTextContainer: {
     zIndex: 1,
   },
